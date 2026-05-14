@@ -35,6 +35,10 @@ app.use('/api/fraud-detection', fraudDetectionRoutes);
 app.use('/api/alerts', alertsRoutes);
 app.use('/api/transaction-import', transactionImportRoutes);
 app.use('/api/risk-assessment', riskAssessmentRoutes);
+app.use('/api/migration-path', require('./routes/migrationPath'));
+app.use('/api/archive-cleanup', require('./routes/archiveCleanup'));
+app.use('/api/snapshot-diff', require('./routes/snapshotDiff'));
+app.use('/api/demo-build', require('./routes/demoBuild'));
 
 // Health check
 app.get('/api/health', (req, res) => {
@@ -53,6 +57,14 @@ app.get('/api/health', (req, res) => {
 });
 
 const PORT = process.env.PORT || 3002;
+
+// === Batch 03 Gaps & Frontend Mounts ===
+try {
+  const _batch03 = require('../routes/batch03Gaps');
+  if (typeof authenticateToken === 'function') app.use('/api', authenticateToken, _batch03);
+  else app.use('/api', _batch03);
+} catch (_e) { /* batch03 gap routes optional */ }
+
 app.listen(PORT, () => {
   console.log(`AI Finance Platform running on port ${PORT}`);
   console.log('Modules: Robo-Advisor, Credit Scoring, Fraud Detection');
