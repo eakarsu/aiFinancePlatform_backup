@@ -39,6 +39,7 @@ app.use('/api/migration-path', require('./routes/migrationPath'));
 app.use('/api/archive-cleanup', require('./routes/archiveCleanup'));
 app.use('/api/snapshot-diff', require('./routes/snapshotDiff'));
 app.use('/api/demo-build', require('./routes/demoBuild'));
+app.use('/api/restore-readiness', require('./routes/restoreReadiness'));
 
 // Health check
 app.get('/api/health', (req, res) => {
