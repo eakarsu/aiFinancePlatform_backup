@@ -1,0 +1,10 @@
+:root { font-family: Inter, system-ui, sans-serif; color: #13233f; background: #f3f6fb; }
+body { margin: 0; }
+main { max-width: 48rem; margin: auto; padding: 3rem 1.25rem; }
+.eyebrow { color: #0f766e; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; }
+section { margin-top: 1.25rem; padding: 1.25rem; background: white; border: 1px solid #d7dfeb; border-radius: .75rem; }
+form, label { display: grid; gap: .5rem; }
+form { gap: 1rem; }
+input, button { box-sizing: border-box; min-height: 2.75rem; border-radius: .45rem; font: inherit; }
+input { border: 1px solid #8795aa; padding: .5rem .7rem; }
+button { border: 0; background: #0f766e; color: white; font-weight: 700; }

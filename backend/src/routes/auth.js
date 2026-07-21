@@ -10,6 +10,12 @@ router.post('/register', async (req, res) => {
     const prisma = req.app.get('prisma');
     const { email, password, firstName, lastName, phone } = req.body;
 
+    if (typeof email !== 'string' || !email.includes('@') ||
+        typeof password !== 'string' || password.length < 12 ||
+        typeof firstName !== 'string' || typeof lastName !== 'string') {
+      return res.status(400).json({ error: 'Valid email, names, and a password of at least 12 characters are required' });
+    }
+
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
       return res.status(400).json({ error: 'Email already registered' });
@@ -71,6 +77,9 @@ router.post('/login', async (req, res) => {
 // Demo Login - bypasses password check for demo account only
 router.post('/demo-login', async (req, res) => {
   try {
+    if (process.env.NODE_ENV === 'production' || process.env.ENABLE_DEMO_LOGIN !== 'true') {
+      return res.status(404).json({ error: 'Not found' });
+    }
     const prisma = req.app.get('prisma');
 
     // Only works for demo account
@@ -136,6 +145,10 @@ router.put('/change-password', authenticateToken, async (req, res) => {
   try {
     const prisma = req.app.get('prisma');
     const { currentPassword, newPassword } = req.body;
+
+    if (typeof newPassword !== 'string' || newPassword.length < 12) {
+      return res.status(400).json({ error: 'New password must be at least 12 characters' });
+    }
 
     // Get current user with password
     const user = await prisma.user.findUnique({

@@ -4,6 +4,7 @@ const cors = require('cors');
 const { PrismaClient } = require('@prisma/client');
 const { PrismaPg } = require('@prisma/adapter-pg');
 const { Pool } = require('pg');
+const path = require('path');
 
 const authRoutes = require('./routes/auth');
 const roboAdvisorRoutes = require('./routes/roboAdvisor');
@@ -12,8 +13,16 @@ const fraudDetectionRoutes = require('./routes/fraudDetection');
 const alertsRoutes = require('./routes/alerts');
 const transactionImportRoutes = require('./routes/transactionImport');
 const riskAssessmentRoutes = require('./routes/riskAssessment');
+const { authenticateToken } = require('./middleware/auth');
 
 const app = express();
+
+if (!process.env.DATABASE_URL) {
+  throw new Error('DATABASE_URL is required');
+}
+if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32) {
+  throw new Error('JWT_SECRET must be a unique value of at least 32 characters');
+}
 
 // Create PostgreSQL connection pool
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
@@ -21,8 +30,17 @@ const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
 // Middleware
-app.use(cors());
-app.use(express.json());
+const allowedOrigins = (process.env.CORS_ORIGINS || 'http://localhost:3002')
+  .split(',')
+  .map((value) => value.trim())
+  .filter(Boolean);
+app.use(cors({
+  origin(origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+    return callback(new Error('Origin not allowed'));
+  }
+}));
+app.use(express.json({ limit: '1mb' }));
 
 // Make prisma available to routes
 app.set('prisma', prisma);
@@ -58,6 +76,7 @@ app.get('/api/health', (req, res) => {
 });
 
 const PORT = process.env.PORT || 3002;
+const HOST = process.env.HOST || '127.0.0.1';
 
 // === Batch 03 Gaps & Frontend Mounts ===
 try {
@@ -66,7 +85,16 @@ try {
   else app.use('/api', _batch03);
 } catch (_e) { /* batch03 gap routes optional */ }
 
-app.listen(PORT, () => {
-  console.log(`AI Finance Platform running on port ${PORT}`);
+const webRoot = path.resolve(__dirname, '../../web');
+app.use(express.static(webRoot));
+app.get('/', (_req, res) => res.sendFile(path.join(webRoot, 'index.html')));
+
+app.use((err, _req, res, _next) => {
+  console.error('Request failed:', err.message);
+  res.status(500).json({ error: 'Internal server error' });
+});
+
+app.listen(PORT, HOST, () => {
+  console.log(`AI Finance Platform running at http://${HOST}:${PORT}`);
   console.log('Modules: Robo-Advisor, Credit Scoring, Fraud Detection');
 });

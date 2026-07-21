@@ -35,6 +35,13 @@ function randomFloat(min, max, decimals = 2) {
 }
 
 async function main() {
+  if (process.env.DESTRUCTIVE_DEMO_SEED_ACKNOWLEDGEMENT !== 'replace-all-data-with-demo-fixtures') {
+    throw new Error('Set DESTRUCTIVE_DEMO_SEED_ACKNOWLEDGEMENT=replace-all-data-with-demo-fixtures to run this destructive demo seed');
+  }
+  const demoPassword = process.env.DEMO_SEED_PASSWORD;
+  if (!demoPassword || demoPassword.length < 12) {
+    throw new Error('DEMO_SEED_PASSWORD of at least 12 characters is required');
+  }
   console.log('🌱 Starting database seed...\n');
 
   // Clear existing data
@@ -76,7 +83,7 @@ async function main() {
     { first: 'Daniel', last: 'Clark', email: 'dclark@email.com' },
   ];
 
-  const hashedPassword = await bcrypt.hash('demo123456', 10);
+  const hashedPassword = await bcrypt.hash(demoPassword, 12);
 
   const users = await Promise.all(
     userNames.map((user, index) =>
@@ -737,7 +744,7 @@ async function main() {
   console.log(`   🏦 Plaid Connections:    ${plaidConnections.length}`);
   console.log(`   🤖 AI Analysis Logs:     ${aiLogs.length}`);
   console.log('═'.repeat(60));
-  console.log('\n🎉 Demo credentials: demo@aifinance.com / demo123456\n');
+  console.log('\n🎉 Demo fixtures created; credentials were supplied through the environment.\n');
 }
 
 main()

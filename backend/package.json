@@ -7,6 +7,7 @@
     "start": "node src/index.js",
     "dev": "nodemon --watch src --ext js,json src/index.js",
     "db:push": "prisma db push",
+    "create-admin": "node scripts/provision-admin.cjs",
     "db:generate": "prisma generate",
     "db:studio": "prisma studio",
     "db:seed": "node prisma/seed.js",
