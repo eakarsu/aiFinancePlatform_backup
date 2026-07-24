@@ -53,6 +53,7 @@ app.use('/api/fraud-detection', fraudDetectionRoutes);
 app.use('/api/alerts', alertsRoutes);
 app.use('/api/transaction-import', transactionImportRoutes);
 app.use('/api/risk-assessment', riskAssessmentRoutes);
+app.use('/api/application-ai', require('./routes/applicationAi'));
 app.use('/api/migration-path', require('./routes/migrationPath'));
 app.use('/api/archive-cleanup', require('./routes/archiveCleanup'));
 app.use('/api/snapshot-diff', require('./routes/snapshotDiff'));

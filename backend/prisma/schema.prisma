@@ -44,6 +44,9 @@ model User {
   // Plaid Connections
   plaidConnections PlaidConnection[]
 
+  // Runtime-verified AI guidance
+  runtimeAiResults RuntimeAiResult[]
+
   @@map("users")
 }
 
@@ -447,4 +450,19 @@ model PlaidConnection {
   updatedAt       DateTime @updatedAt
 
   @@map("plaid_connections")
+}
+
+model RuntimeAiResult {
+  id              String   @id @default(uuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Restrict)
+  prompt          String
+  model           String
+  providerReceipt Json
+  result          String
+  usage           Json?
+  createdAt       DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@map("runtime_ai_results")
 }

@@ -8,7 +8,10 @@ const { authenticateToken } = require('../middleware/auth');
 router.post('/register', async (req, res) => {
   try {
     const prisma = req.app.get('prisma');
-    const { email, password, firstName, lastName, phone } = req.body;
+    const { email, password, phone } = req.body;
+    const suppliedName = String(req.body.name || req.body.full_name || req.body.displayName || '').trim();
+    const firstName = String(req.body.firstName || req.body.first_name || suppliedName.split(/\s+/)[0] || '').trim();
+    const lastName = String(req.body.lastName || req.body.last_name || suppliedName.split(/\s+/).slice(1).join(' ') || 'User').trim();
 
     if (typeof email !== 'string' || !email.includes('@') ||
         typeof password !== 'string' || password.length < 12 ||

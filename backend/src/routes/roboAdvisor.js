@@ -7,7 +7,6 @@ const investmentEngine = require('../utils/investmentEngine');
 async function callOpenRouter(prompt, systemPrompt = '') {
   console.log('=== OpenRouter API Call ===');
   console.log('Model:', process.env.OPENROUTER_MODEL || 'anthropic/claude-3-haiku');
-  console.log('API Key (first 20 chars):', process.env.OPENROUTER_API_KEY?.substring(0, 20));
   console.log('Prompt length:', prompt.length);
 
   const startTime = Date.now();
