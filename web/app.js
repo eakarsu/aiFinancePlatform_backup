@@ -5,6 +5,21 @@ const modules = document.querySelector('#modules');
 const form = document.querySelector('#login');
 const loginStatus = document.querySelector('#login-status');
 
+const demoCredentialsButton = document.createElement('button');
+demoCredentialsButton.type = 'button';
+demoCredentialsButton.textContent = 'Auto Fill Demo Credentials';
+demoCredentialsButton.setAttribute('aria-label', 'Auto Fill Demo Credentials');
+demoCredentialsButton.addEventListener('click', async () => {
+  try {
+    const response = await fetch('/api/auth/demo-credentials', { credentials: 'same-origin', cache: 'no-store' });
+    if (!response.ok) throw new Error('Demo credentials are unavailable');
+    const credentials = await response.json();
+    form.elements.email.value = credentials.email;
+    form.elements.password.value = credentials.password;
+  } catch (error) { loginStatus.textContent = error.message; }
+});
+form.insertBefore(demoCredentialsButton, form.querySelector('button'));
+
 fetch('/api/health', { credentials: 'same-origin' })
   .then(async (response) => {
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
