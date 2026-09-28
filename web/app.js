@@ -4,6 +4,22 @@ const health = document.querySelector('#health');
 const modules = document.querySelector('#modules');
 const form = document.querySelector('#login');
 const loginStatus = document.querySelector('#login-status');
+const authSection = form.closest('section');
+
+function showAuthenticatedDashboard() {
+  const heading = document.createElement('h2');
+  heading.textContent = 'Authenticated Dashboard';
+  const message = document.createElement('p');
+  message.textContent = 'Signed in successfully. Your session is active for this browser tab.';
+  const signOutButton = document.createElement('button');
+  signOutButton.type = 'button';
+  signOutButton.textContent = 'Sign Out';
+  signOutButton.addEventListener('click', () => {
+    sessionStorage.removeItem('aiFinanceToken');
+    window.location.reload();
+  });
+  authSection.replaceChildren(heading, message, signOutButton);
+}
 
 const demoCredentialsButton = document.createElement('button');
 demoCredentialsButton.type = 'button';
@@ -49,8 +65,7 @@ form.addEventListener('submit', async (event) => {
     if (!response.ok) throw new Error('Sign-in failed');
     const result = await response.json();
     sessionStorage.setItem('aiFinanceToken', result.token);
-    loginStatus.textContent = `Signed in as ${result.user.email}. Token is stored for this tab only.`;
-    form.reset();
+    showAuthenticatedDashboard();
   } catch (error) {
     loginStatus.textContent = error.message;
   }
