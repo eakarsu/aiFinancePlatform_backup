@@ -5,9 +5,12 @@ const modules = document.querySelector('#modules');
 const form = document.querySelector('#login');
 const loginStatus = document.querySelector('#login-status');
 const authSection = form.closest('section');
+const appShell = document.querySelector('#app-shell');
+const appSidebar = document.querySelector('#app-sidebar');
 
 function showAuthenticatedDashboard() {
   const heading = document.createElement('h2');
+  heading.id = 'dashboard';
   heading.textContent = 'Authenticated Dashboard';
   const message = document.createElement('p');
   message.textContent = 'Signed in successfully. Your session is active for this browser tab.';
@@ -19,6 +22,8 @@ function showAuthenticatedDashboard() {
     window.location.reload();
   });
   authSection.replaceChildren(heading, message, signOutButton);
+  appSidebar.hidden = false;
+  appShell.classList.add('authenticated');
 }
 
 const demoCredentialsButton = document.createElement('button');
@@ -70,3 +75,13 @@ form.addEventListener('submit', async (event) => {
     loginStatus.textContent = error.message;
   }
 });
+
+const savedToken = sessionStorage.getItem('aiFinanceToken');
+if (savedToken) {
+  fetch('/api/auth/me', { headers: { authorization: `Bearer ${savedToken}` }, credentials: 'same-origin' })
+    .then(response => {
+      if (response.ok) showAuthenticatedDashboard();
+      else sessionStorage.removeItem('aiFinanceToken');
+    })
+    .catch(() => sessionStorage.removeItem('aiFinanceToken'));
+}
