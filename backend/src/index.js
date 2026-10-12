@@ -1,3 +1,4 @@
+const {serveNativePromptConsole}=require('../../web/serveNativePromptConsole.cjs');
 require('dotenv').config({ path: require('path').resolve(__dirname, '../../.env') });
 const express = require('express');
 const cors = require('cors');
@@ -87,6 +88,7 @@ try {
 } catch (_e) { /* batch03 gap routes optional */ }
 
 const webRoot = path.resolve(__dirname, '../../web');
+app.get('/ai-workspace',(_req,res)=>serveNativePromptConsole(res));
 app.use(express.static(webRoot));
 app.get('/', (_req, res) => res.sendFile(path.join(webRoot, 'index.html')));
 

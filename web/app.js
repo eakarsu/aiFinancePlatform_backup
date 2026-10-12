@@ -28,8 +28,8 @@ function showAuthenticatedDashboard() {
 
 const demoCredentialsButton = document.createElement('button');
 demoCredentialsButton.type = 'button';
-demoCredentialsButton.textContent = 'Auto Fill Demo Credentials';
-demoCredentialsButton.setAttribute('aria-label', 'Auto Fill Demo Credentials');
+demoCredentialsButton.textContent = 'Log In as Demo';
+demoCredentialsButton.setAttribute('aria-label', 'Log In as Demo');
 demoCredentialsButton.addEventListener('click', async () => {
   try {
     const response = await fetch('/api/auth/demo-credentials', { credentials: 'same-origin', cache: 'no-store' });
@@ -37,6 +37,7 @@ demoCredentialsButton.addEventListener('click', async () => {
     const credentials = await response.json();
     form.elements.email.value = credentials.email;
     form.elements.password.value = credentials.password;
+    form.requestSubmit();
   } catch (error) { loginStatus.textContent = error.message; }
 });
 form.insertBefore(demoCredentialsButton, form.querySelector('button'));

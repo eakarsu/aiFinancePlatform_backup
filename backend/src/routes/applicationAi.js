@@ -4,6 +4,30 @@ const { authenticateToken } = require('../middleware/auth');
 const router = express.Router();
 router.use(authenticateToken);
 
+router.get('/finance-advice/history', async (req, res) => {
+  try {
+    const prisma = req.app.get('prisma');
+    const history = await prisma.runtimeAiResult.findMany({
+      where: { userId: req.user.id },
+      orderBy: { createdAt: 'desc' },
+      take: 50,
+      select: {
+        id: true,
+        prompt: true,
+        model: true,
+        providerReceipt: true,
+        result: true,
+        usage: true,
+        createdAt: true,
+      },
+    });
+    return res.json({ history });
+  } catch (error) {
+    console.error('AI history request failed', error.message);
+    return res.status(500).json({ error: 'Failed to load saved AI results' });
+  }
+});
+
 router.post('/finance-advice', async (req, res) => {
   const prompt = String(req.body?.prompt || '').trim();
   if (!prompt) return res.status(400).json({ error: 'prompt is required' });
